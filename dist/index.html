@@ -84,7 +84,7 @@
   <dialog class="lightbox" id="lightbox">
     <div class="lightbox-bar">
       <div><strong id="lightboxName"></strong><span id="lightboxPath"></span></div>
-      <div class="lightbox-actions"><button id="fullscreenButton" type="button">Full screen</button><button id="closeLightbox" type="button" aria-label="Close viewer">×</button></div>
+      <div class="lightbox-actions"><button id="closeLightbox" type="button" aria-label="Close viewer">×</button></div>
     </div>
     <button class="lightbox-nav prev" id="prevButton" type="button" aria-label="Previous image">‹</button>
     <figure>
@@ -102,10 +102,13 @@
             <span id="pdfZoomLabel">100%</span>
             <button id="pdfZoomIn" type="button" aria-label="Zoom in">+</button>
             <button id="pdfFit" type="button">Fit page</button>
+            <button id="pdfFullscreen" type="button">Full screen</button>
             <button class="pdf-download" id="pdfDownload" type="button">Download</button>
           </div>
         </div>
-        <div class="pdf-canvas-wrap" id="pdfCanvasWrap"><canvas id="pdfCanvas"></canvas><div class="pdf-loading" id="pdfLoading">Rendering PDF…</div></div>
+        <div class="pdf-canvas-wrap" id="pdfCanvasWrap"><div class="pdf-pages" id="pdfPages"></div><div class="pdf-loading" id="pdfLoading">Rendering PDF…</div></div>
+        <div class="pdf-fullscreen-hotspot" id="pdfFullscreenHotspot" aria-label="Show full screen exit control"></div>
+        <button class="pdf-fullscreen-exit" id="pdfFullscreenExit" type="button">Exit full screen</button>
       </div>
       <figcaption id="lightboxCaption"></figcaption>
     </figure>
