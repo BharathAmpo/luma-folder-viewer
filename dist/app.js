@@ -40,7 +40,7 @@ document.querySelector('#installButton').addEventListener('click',async()=>{
   text.innerHTML=ios?'<p>In Safari, tap <strong>Share</strong>, then choose <strong>Add to Home Screen</strong> and tap <strong>Add</strong>.</p>':'<p>Open your browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</p>';dialog.showModal();
 });
 document.querySelector('#installClose').addEventListener('click',()=>document.querySelector('#installDialog').close());
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=11',{updateViaCache:'none'}).then(registration=>registration.update()).catch(console.error));
 const appShell=document.querySelector('.app-shell');
 const libraryToggle=document.querySelector('#libraryToggle');
 libraryToggle.addEventListener('click',()=>{
