@@ -1,0 +1,14 @@
+{
+  "name": "Luma Folder Viewer",
+  "short_name": "Luma",
+  "description": "Private, on-device image and PDF folder viewer.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f7f4",
+  "theme_color": "#171914",
+  "orientation": "any",
+  "icons": [
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

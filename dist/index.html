@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A private, browser-local image folder viewer.">
+  <meta name="theme-color" content="#171914">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Luma">
+  <title>Luma — Folder image viewer</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="icon-button library-toggle" id="libraryToggle" type="button" aria-label="Close Library panel" aria-expanded="true" title="Show or hide Library">☰</button>
+      <a class="brand" href="#" aria-label="Luma home"><span class="brand-mark">L</span><span>Luma</span></a>
+      <div class="privacy"><span aria-hidden="true">●</span> Your images stay on this device</div>
+      <div class="actions">
+        <button class="icon-button install-button" id="installButton" type="button" aria-label="Install Luma app" title="Install app">↓</button>
+        <button class="icon-button" id="themeButton" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
+        <button class="primary compact" id="headerUpload" type="button">Choose folder</button>
+      </div>
+    </header>
+
+    <aside class="sidebar" aria-label="Image folders">
+      <div class="sidebar-heading"><span>Library</span><span class="count" id="folderCount">0</span></div>
+      <button class="nav-item active" data-folder="__all" type="button">
+        <span class="nav-icon">▦</span><span>All images</span><span class="nav-count" id="allCount">0</span>
+      </button>
+      <div class="folder-list" id="folderList"></div>
+      <div class="sidebar-foot">
+        <p>Folders are read in your browser and never uploaded.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="empty-state" id="emptyState">
+        <div class="empty-art" aria-hidden="true">
+          <div class="photo p1"><span></span></div><div class="photo p2"><span></span></div><div class="photo p3"><span></span></div>
+        </div>
+        <p class="eyebrow">Your private image space</p>
+        <h1>Every image.<br><em>One beautiful place.</em></h1>
+        <p class="lede">Choose a folder to browse every image and PDF inside it — organized by subfolder, fast to scroll, and ready for fullscreen viewing.</p>
+        <button class="primary hero-button" id="heroUpload" type="button">Choose a media folder</button>
+        <p class="hint">JPG, PNG, GIF, WebP, SVG, AVIF, PDF and more</p>
+      </section>
+
+      <section class="gallery-view" id="galleryView" hidden>
+        <div class="gallery-head">
+          <div><p class="eyebrow" id="galleryEyebrow">Library</p><h1 id="galleryTitle">All images</h1><p id="galleryMeta"></p></div>
+          <div class="control-stack">
+            <div class="view-switch" aria-label="Gallery view">
+              <button type="button" data-view="image">Image-wise</button>
+              <button type="button" data-view="folder">Folder-wise</button>
+              <button class="active" type="button" data-view="grid">Full Grid</button>
+            </div>
+            <div class="gallery-controls">
+              <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Search files" aria-label="Search files"></label>
+              <div class="segmented" aria-label="Image size">
+                <button type="button" data-size="small" aria-label="Small thumbnails">▦</button>
+                <button class="active" type="button" data-size="medium" aria-label="Medium thumbnails">▦</button>
+                <button type="button" data-size="large" aria-label="Large thumbnails">▣</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-grid size-medium" id="galleryGrid"></div>
+        <div class="load-sentinel" id="sentinel"><span></span> Loading more images</div>
+        <div class="no-results" id="noResults" hidden>No images match that search.</div>
+      </section>
+    </main>
+  </div>
+
+  <input id="folderInput" type="file" accept="image/*,application/pdf,.pdf" webkitdirectory directory multiple hidden>
+
+  <dialog class="lightbox" id="lightbox">
+    <div class="lightbox-bar">
+      <div><strong id="lightboxName"></strong><span id="lightboxPath"></span></div>
+      <div class="lightbox-actions"><button id="fullscreenButton" type="button">Full screen</button><button id="closeLightbox" type="button" aria-label="Close viewer">×</button></div>
+    </div>
+    <button class="lightbox-nav prev" id="prevButton" type="button" aria-label="Previous image">‹</button>
+    <figure>
+      <img id="lightboxImage" alt="">
+      <div class="pdf-viewer" id="pdfViewer" hidden>
+        <div class="pdf-toolbar">
+          <button id="pdfPrev" type="button" aria-label="Previous PDF page">‹</button>
+          <label><input id="pdfPage" type="number" min="1" value="1" aria-label="PDF page number"><span id="pdfPageCount">/ 1</span></label>
+          <button id="pdfNext" type="button" aria-label="Next PDF page">›</button>
+          <span class="pdf-divider"></span>
+          <button id="pdfZoomOut" type="button" aria-label="Zoom out">−</button>
+          <span id="pdfZoomLabel">100%</span>
+          <button id="pdfZoomIn" type="button" aria-label="Zoom in">+</button>
+          <button id="pdfFit" type="button">Fit</button>
+          <button id="pdfDownload" type="button">Download</button>
+        </div>
+        <div class="pdf-canvas-wrap" id="pdfCanvasWrap"><canvas id="pdfCanvas"></canvas><div class="pdf-loading" id="pdfLoading">Rendering PDF…</div></div>
+      </div>
+      <figcaption id="lightboxCaption"></figcaption>
+    </figure>
+    <button class="lightbox-nav next" id="nextButton" type="button" aria-label="Next image">›</button>
+  </dialog>
+  <dialog class="install-dialog" id="installDialog">
+    <button class="install-close" id="installClose" type="button" aria-label="Close install instructions">×</button>
+    <span class="install-logo">L</span>
+    <h2>Install Luma</h2>
+    <div id="installInstructions"></div>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>
