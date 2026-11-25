@@ -9,7 +9,7 @@ const pdfViewer=document.querySelector('#pdfViewer');
 const pdfPages=document.querySelector('#pdfPages');
 let pdfjsPromise,pdfDocument=null,pdfPageNumber=1,pdfScale=1,pdfFitMode=true,pdfRenderGeneration=0;
 const pdfRenderTasks=new Set();
-let mediaNameTimer=null,pdfFullscreenTimer=null;
+let mediaNameTimer=null,pdfFullscreenTimer=null,pdfFileNavTimer=null;
 let images=[],filtered=[],visible=[],selectedFolder='__all',rendered=0,currentIndex=0,viewMode='grid',imageViewIndex=0;
 const BATCH=36,urls=new Set();
 let deferredInstallPrompt=null;
@@ -40,7 +40,7 @@ document.querySelector('#installButton').addEventListener('click',async()=>{
   text.innerHTML=ios?'<p>In Safari, tap <strong>Share</strong>, then choose <strong>Add to Home Screen</strong> and tap <strong>Add</strong>.</p>':'<p>Open your browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</p>';dialog.showModal();
 });
 document.querySelector('#installClose').addEventListener('click',()=>document.querySelector('#installDialog').close());
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=11',{updateViaCache:'none'}).then(registration=>registration.update()).catch(console.error));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=12',{updateViaCache:'none'}).then(registration=>registration.update()).catch(console.error));
 const appShell=document.querySelector('.app-shell');
 const libraryToggle=document.querySelector('#libraryToggle');
 libraryToggle.addEventListener('click',()=>{
@@ -186,7 +186,12 @@ document.querySelector('#pdfFullscreen').addEventListener('click',async()=>{try{
 function hidePdfFullscreenExit(){clearTimeout(pdfFullscreenTimer);document.querySelector('#pdfFullscreenExit').classList.remove('visible')}
 document.querySelector('#pdfFullscreenHotspot').addEventListener('click',()=>{const button=document.querySelector('#pdfFullscreenExit');clearTimeout(pdfFullscreenTimer);button.classList.add('visible');pdfFullscreenTimer=setTimeout(hidePdfFullscreenExit,2600)});
 document.querySelector('#pdfFullscreenExit').addEventListener('click',event=>{event.stopPropagation();hidePdfFullscreenExit();if(document.fullscreenElement)document.exitFullscreen();else document.webkitExitFullscreen?.()});
-function handlePdfFullscreenChange(){hidePdfFullscreenExit();if(pdfDocument&&pdfFitMode)setTimeout(renderPdfPages,50)}
+function hidePdfFileNav(){clearTimeout(pdfFileNavTimer);document.querySelectorAll('.pdf-file-nav').forEach(button=>button.classList.remove('visible'))}
+function showPdfFileNav(direction){hidePdfFileNav();document.querySelector(`#pdfFile${direction<0?'Prev':'Next'}`).classList.add('visible');pdfFileNavTimer=setTimeout(hidePdfFileNav,2600)}
+document.querySelector('#pdfFilePrevHotspot').addEventListener('click',()=>showPdfFileNav(-1));document.querySelector('#pdfFileNextHotspot').addEventListener('click',()=>showPdfFileNav(1));
+async function moveFromPdfFullscreen(direction){hidePdfFileNav();const targetIndex=(currentIndex+direction+visible.length)%visible.length,target=visible[targetIndex],fullscreen=document.fullscreenElement||document.webkitFullscreenElement;if(target?.type!=='pdf'&&fullscreen){if(document.fullscreenElement)await document.exitFullscreen();else await document.webkitExitFullscreen?.()}currentIndex=targetIndex;updateLightbox()}
+document.querySelector('#pdfFilePrev').addEventListener('click',event=>{event.stopPropagation();moveFromPdfFullscreen(-1)});document.querySelector('#pdfFileNext').addEventListener('click',event=>{event.stopPropagation();moveFromPdfFullscreen(1)});
+function handlePdfFullscreenChange(){hidePdfFullscreenExit();hidePdfFileNav();if(pdfDocument&&pdfFitMode)setTimeout(renderPdfPages,50)}
 document.addEventListener('fullscreenchange',handlePdfFullscreenChange);document.addEventListener('webkitfullscreenchange',handlePdfFullscreenChange);
 document.querySelector('#pdfDownload').addEventListener('click',()=>{const item=visible[currentIndex];if(item?.type!=='pdf')return;const link=document.createElement('a');link.href=item.url;link.download=item.name;link.click()});
 let pdfScrollFrame=0;document.querySelector('#pdfCanvasWrap').addEventListener('scroll',event=>{cancelAnimationFrame(pdfScrollFrame);pdfScrollFrame=requestAnimationFrame(()=>{if(!pdfDocument)return;const wrap=event.currentTarget,center=wrap.scrollTop+wrap.clientHeight/2;let closest=pdfPageNumber,distance=Infinity;pdfPages.querySelectorAll('.pdf-page').forEach(page=>{const pageCenter=page.offsetTop-pdfPages.offsetTop+page.offsetHeight/2,gap=Math.abs(pageCenter-center);if(gap<distance){distance=gap;closest=Number(page.dataset.page)}});if(closest!==pdfPageNumber){pdfPageNumber=closest;updatePdfPageUi()}})});
