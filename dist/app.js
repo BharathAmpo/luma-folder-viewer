@@ -134,8 +134,8 @@ async function getPdfJs(){
   return pdfjsPromise;
 }
 async function loadPdf(item){
-  const loading=document.querySelector('#pdfLoading');loading.hidden=false;pdfPageNumber=1;pdfFitMode=true;
-  try{const lib=await getPdfJs();pdfDocument=await lib.getDocument(item.url).promise;document.querySelector('#pdfPageCount').textContent=`/ ${pdfDocument.numPages}`;await renderPdfPage()}catch(error){loading.textContent='Unable to render this PDF';console.error(error)}
+  const loading=document.querySelector('#pdfLoading');loading.textContent='Rendering PDF…';loading.hidden=false;pdfPageNumber=1;pdfFitMode=true;document.querySelector('#pdfDocName').textContent=item.name;
+  try{const lib=await getPdfJs(),bytes=new Uint8Array(await item.file.arrayBuffer());pdfDocument=await lib.getDocument({data:bytes}).promise;document.querySelector('#pdfPageCount').textContent=`/ ${pdfDocument.numPages}`;await renderPdfPage()}catch(error){loading.textContent='This PDF could not be rendered. Try selecting the folder again.';console.error(error)}
 }
 async function renderPdfPage(){
   if(!pdfDocument)return;const loading=document.querySelector('#pdfLoading');loading.hidden=false;
@@ -145,7 +145,7 @@ async function renderPdfPage(){
     pdfScale=Math.max(.25,Math.min(4,pdfScale));const viewport=page.getViewport({scale:pdfScale}),pixelRatio=Math.min(window.devicePixelRatio||1,2),context=pdfCanvas.getContext('2d');
     pdfCanvas.width=Math.floor(viewport.width*pixelRatio);pdfCanvas.height=Math.floor(viewport.height*pixelRatio);pdfCanvas.style.width=`${viewport.width}px`;pdfCanvas.style.height=`${viewport.height}px`;
     if(pdfRenderTask)pdfRenderTask.cancel();pdfRenderTask=page.render({canvasContext:context,viewport,transform:pixelRatio===1?null:[pixelRatio,0,0,pixelRatio,0,0]});await pdfRenderTask.promise;pdfRenderTask=null;
-    document.querySelector('#pdfPage').value=pdfPageNumber;document.querySelector('#pdfZoomLabel').textContent=`${Math.round(pdfScale*100)}%`;loading.hidden=true;
+    document.querySelector('#pdfPage').value=pdfPageNumber;document.querySelector('#pdfZoomLabel').textContent=`${Math.round(pdfScale*100)}%`;document.querySelector('#pdfPrev').disabled=pdfPageNumber===1;document.querySelector('#pdfNext').disabled=pdfPageNumber===pdfDocument.numPages;loading.hidden=true;
   }catch(error){if(error?.name!=='RenderingCancelledException')console.error(error)}
 }
 function changePdfPage(step){if(!pdfDocument)return;pdfPageNumber=Math.max(1,Math.min(pdfDocument.numPages,pdfPageNumber+step));renderPdfPage()}

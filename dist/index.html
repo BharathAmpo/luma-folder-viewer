@@ -88,15 +88,18 @@
       <img id="lightboxImage" alt="">
       <div class="pdf-viewer" id="pdfViewer" hidden>
         <div class="pdf-toolbar">
-          <button id="pdfPrev" type="button" aria-label="Previous PDF page">‹</button>
-          <label><input id="pdfPage" type="number" min="1" value="1" aria-label="PDF page number"><span id="pdfPageCount">/ 1</span></label>
-          <button id="pdfNext" type="button" aria-label="Next PDF page">›</button>
-          <span class="pdf-divider"></span>
-          <button id="pdfZoomOut" type="button" aria-label="Zoom out">−</button>
-          <span id="pdfZoomLabel">100%</span>
-          <button id="pdfZoomIn" type="button" aria-label="Zoom in">+</button>
-          <button id="pdfFit" type="button">Fit</button>
-          <button id="pdfDownload" type="button">Download</button>
+          <div class="pdf-brand"><b>L</b><span><strong>Document viewer</strong><small id="pdfDocName"></small></span></div>
+          <div class="pdf-controls">
+            <button id="pdfPrev" type="button" aria-label="Previous PDF page">‹</button>
+            <label><input id="pdfPage" type="number" min="1" value="1" aria-label="PDF page number"><span id="pdfPageCount">/ 1</span></label>
+            <button id="pdfNext" type="button" aria-label="Next PDF page">›</button>
+            <span class="pdf-divider"></span>
+            <button id="pdfZoomOut" type="button" aria-label="Zoom out">−</button>
+            <span id="pdfZoomLabel">100%</span>
+            <button id="pdfZoomIn" type="button" aria-label="Zoom in">+</button>
+            <button id="pdfFit" type="button">Fit page</button>
+            <button class="pdf-download" id="pdfDownload" type="button">Download</button>
+          </div>
         </div>
         <div class="pdf-canvas-wrap" id="pdfCanvasWrap"><canvas id="pdfCanvas"></canvas><div class="pdf-loading" id="pdfLoading">Rendering PDF…</div></div>
       </div>
