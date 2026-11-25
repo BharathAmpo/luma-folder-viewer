@@ -8,6 +8,7 @@ const lightbox=document.querySelector('#lightbox');
 const pdfViewer=document.querySelector('#pdfViewer');
 const pdfCanvas=document.querySelector('#pdfCanvas');
 let pdfjsPromise,pdfDocument=null,pdfPageNumber=1,pdfScale=1,pdfFitMode=true,pdfRenderTask=null;
+let mediaNameTimer=null;
 let images=[],filtered=[],visible=[],selectedFolder='__all',rendered=0,currentIndex=0,viewMode='grid',imageViewIndex=0;
 const BATCH=36,urls=new Set();
 let deferredInstallPrompt=null;
@@ -141,10 +142,15 @@ galleryGrid.addEventListener('click',e=>{
 function openLightbox(index){currentIndex=index;lightbox.showModal();document.body.style.overflow='hidden';updateLightbox()}
 async function updateLightbox(){
   const item=visible[currentIndex];if(!item)return;const image=document.querySelector('#lightboxImage');
+  hideMediaName();
   if(pdfRenderTask){pdfRenderTask.cancel();pdfRenderTask=null}if(pdfDocument){pdfDocument.destroy();pdfDocument=null}
   if(item.type==='pdf'){image.hidden=true;image.removeAttribute('src');pdfViewer.hidden=false;await loadPdf(item)}else{pdfViewer.hidden=true;image.hidden=false;image.src=item.url;image.alt=item.name}
   document.querySelector('#lightboxName').textContent=item.name;document.querySelector('#lightboxPath').textContent=item.path;document.querySelector('#lightboxCaption').textContent=`${currentIndex+1} of ${visible.length}`;
 }
+function showMediaName(){const item=visible[currentIndex],overlay=document.querySelector('#mediaNameOverlay');if(!item)return;clearTimeout(mediaNameTimer);overlay.textContent=item.name;overlay.classList.add('visible');mediaNameTimer=setTimeout(hideMediaName,2800)}
+function hideMediaName(){clearTimeout(mediaNameTimer);document.querySelector('#mediaNameOverlay').classList.remove('visible')}
+document.querySelector('#lightboxImage').addEventListener('click',showMediaName);
+document.querySelector('#pdfCanvasWrap').addEventListener('click',event=>{if(!event.target.closest('button,input,a'))showMediaName()});
 
 async function getPdfJs(){
   if(!pdfjsPromise)pdfjsPromise=Promise.resolve().then(()=>{const lib=window.pdfjsLib;if(!lib)throw new Error('PDF.js failed to load');lib.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdf.worker.min.js',location.href).href;return lib});
@@ -174,7 +180,7 @@ document.querySelector('#pdfDownload').addEventListener('click',()=>{const item=
 window.addEventListener('resize',()=>{if(lightbox.open&&pdfDocument&&pdfFitMode)renderPdfPage()});
 function move(direction){currentIndex=(currentIndex+direction+visible.length)%visible.length;updateLightbox()}
 document.querySelector('#prevButton').addEventListener('click',()=>move(-1));document.querySelector('#nextButton').addEventListener('click',()=>move(1));
-document.querySelector('#closeLightbox').addEventListener('click',()=>lightbox.close());lightbox.addEventListener('close',()=>{document.body.style.overflow='';if(pdfRenderTask)pdfRenderTask.cancel();if(pdfDocument){pdfDocument.destroy();pdfDocument=null}});
+document.querySelector('#closeLightbox').addEventListener('click',()=>lightbox.close());lightbox.addEventListener('close',()=>{hideMediaName();document.body.style.overflow='';if(pdfRenderTask)pdfRenderTask.cancel();if(pdfDocument){pdfDocument.destroy();pdfDocument=null}});
 document.querySelector('#fullscreenButton').addEventListener('click',()=>{if(!document.fullscreenElement)lightbox.requestFullscreen?.();else document.exitFullscreen?.()});
 document.addEventListener('keydown',e=>{if(!lightbox.open)return;if(e.key==='ArrowLeft')move(-1);if(e.key==='ArrowRight')move(1)});
 document.querySelector('.segmented').addEventListener('click',e=>{const b=e.target.closest('[data-size]');if(!b)return;document.querySelectorAll('[data-size]').forEach(x=>x.classList.toggle('active',x===b));galleryGrid.className=`gallery-grid size-${b.dataset.size}`});
