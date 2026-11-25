@@ -143,6 +143,7 @@ galleryGrid.addEventListener('click',e=>{
 function openLightbox(index){currentIndex=index;lightbox.showModal();document.body.style.overflow='hidden';updateLightbox()}
 async function updateLightbox(){
   const item=visible[currentIndex];if(!item)return;const image=document.querySelector('#lightboxImage');
+  lightbox.classList.toggle('viewing-pdf',item.type==='pdf');
   hideMediaName();
   cancelPdfRenders();if(pdfDocument){pdfDocument.destroy();pdfDocument=null}
   if(item.type==='pdf'){image.hidden=true;image.removeAttribute('src');pdfViewer.hidden=false;await loadPdf(item)}else{pdfViewer.hidden=true;image.hidden=false;image.src=item.url;image.alt=item.name}
