@@ -130,7 +130,7 @@ async function updateLightbox(){
 }
 
 async function getPdfJs(){
-  if(!pdfjsPromise)pdfjsPromise=import('./vendor/pdf.mjs').then(lib=>{lib.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdf.worker.mjs',location.href).href;return lib});
+  if(!pdfjsPromise)pdfjsPromise=Promise.resolve().then(()=>{const lib=window.pdfjsLib;if(!lib)throw new Error('PDF.js failed to load');lib.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdf.worker.min.js',location.href).href;return lib});
   return pdfjsPromise;
 }
 async function loadPdf(item){

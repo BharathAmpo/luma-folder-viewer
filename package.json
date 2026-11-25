@@ -2,6 +2,6 @@
   "name": "luma-folder-viewer",
   "private": true,
   "dependencies": {
-    "pdfjs-dist": "6.5.438"
+    "pdfjs-dist": "3.11.174"
   }
 }
