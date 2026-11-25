@@ -21,6 +21,8 @@
       <a class="brand" href="#" aria-label="Luma home"><span class="brand-mark">L</span><span>Luma</span></a>
       <div class="privacy"><span aria-hidden="true">●</span> Your images stay on this device</div>
       <div class="actions">
+        <button class="icon-button refresh-button" id="refreshButton" type="button" aria-label="Refresh and keep current folder" title="Normal refresh — keep folder">↻</button>
+        <button class="icon-button hard-refresh-button" id="hardRefreshButton" type="button" aria-label="Hard refresh and forget current folder" title="Hard refresh — forget folder">⌫</button>
         <button class="icon-button install-button" id="installButton" type="button" aria-label="Install Luma app" title="Install app">↓</button>
         <button class="icon-button" id="themeButton" type="button" aria-label="Toggle theme" title="Toggle theme">◐</button>
         <button class="primary compact" id="headerUpload" type="button">Choose folder</button>
@@ -47,6 +49,7 @@
         <h1>Every image.<br><em>One beautiful place.</em></h1>
         <p class="lede">Choose a folder to browse every image and PDF inside it — organized by subfolder, fast to scroll, and ready for fullscreen viewing.</p>
         <button class="primary hero-button" id="heroUpload" type="button">Choose a media folder</button>
+        <button class="restore-folder" id="restoreFolder" type="button" hidden>Reconnect previous folder</button>
         <p class="hint">JPG, PNG, GIF, WebP, SVG, AVIF, PDF and more</p>
       </section>
 
